@@ -6,6 +6,7 @@
     1. [Cyclomatic Complexity](#cyclomatic-complexity)
     1. [Method Length](#method-length)
     1. [Class Length](#class-length)
+    1. [Dependencies Number](#dependencies-number)
 1. [Code Quality Guidelines](#code-quality-guidelines)
 1. [Hexagonal Architecture](#hexagonal-architecture)
 1. [Testing](#testing)
