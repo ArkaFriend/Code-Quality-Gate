@@ -133,24 +133,119 @@ Il paragrafo contiene linee guida per scrivere _clean code_ secondo Arka.
 
 Si differenzia dal paragrafo [Code Quality Metrics](#code-quality-metrics) in quanto non contiene linee guida misurabili (e.g. il nome di una variabile non è misurabile).
 
+### Naming/Nomenclature
+
+> TODO
+
+### Prefer Composition Over Inheritance
+
+> TODO
+
 
 
 ## Hexagonal Architecture
 > TODO
 
 
+
 ## Testing
 
 Scrivere test chiari è un complicato, forse più che scrivere *clean code* nel codice applicativo.
 
+Per scrivere un test unitario chiaro e facilmente comprensibile, vanno rispettate alcune regole.
+
+Il test dev'essere corredato di 3 sezioni: _Arrange_, _Act_, _Assert_.
+
+Le sezioni [Arrange](#arrange), [Act](#act) e [Assert](#assert) devono essere separate da una riga vuota.
+
+```java
+@Test
+void some_test() {
+  // Arrange
+  
+  // Act
+  
+  // Assert
+}
+```
+
+Altre regole:
+- Utilizzare `any()` negli `when()` dei test in cui vengono fatte asserzioni.
+- Fare dei test a parte per i `verify()`, senza usare `any()` nelle `when()`.
+
+**[⬆ back to top](#table-of-contents)**
+
+### Arrange
+
+Sezione in cui si inizializzano gli input dei test, compresa la programmazione di eventuali mock (`when()`).
+
+**Importante**: mettere in evidenza i valori di input utili ai fini del test, nascondere tutti gli altri.
+
+Nell'esempio che segue, viene testato che, in caso di azienda PIPPO_SRL, verrà lanciata un eccezione per terminare il flusso di esecuzione.
+
+```java
+// BAD
+@Test
+void should_fail_when_azienda_is_PIPPO_SRL() {
+  Azienda azienda = Azienda.from("PIPPO S.R.L.");
+  ServiceInput input = ServiceInput.from(Polizza.from(12345, "A", VITA), azienda);
+
+  assertThatThrownBy(() -> service.execute(input))
+    .isInstanceOf(SomeException.class)
+    .hasMessage("Azienda PIPPO S.R.L. non abilitata all'operazione");
+}
+```
+
+Come si può notare, nel test i dati di Polizza sono totalmente inutili ai fini del test.
+
+Segue un esempio accettabile dello stesso caso:
+
+```java
+// GOOD
+@Test
+void should_fail_when_azienda_is_PIPPO_SRL() {
+  Azienda azienda = Azienda.from("PIPPO S.R.L.");
+
+  assertThatThrownBy(() -> service.execute(anyInputWithAzienda(azienda)))
+    .isInstanceOf(SomeException.class)
+    .hasMessage("Azienda PIPPO S.R.L. non abilitata all'operazione");
+}
+```
+
+**Hint**: aiutarsi costruendo dei builder di test ad-hoc, possibilmente prevalorizzati con valori di default validi.
+
+**[⬆ back to top](#table-of-contents)**
+
+### Act
+
+Sezione in cui viene chiamato il metodo che si sta testando.
+
+Da notare che, in caso si utilizzi ad esempio _AssertJ_ e si testi il lancio di un eccezione, la sezione _Act_ e _Assert_ potrebbero collidere, senza riga vuota.
+
+```java
+@Test
+void some_test() {
+  ServiceInput input = someInput();
+
+  assertThatThrownBy(() -> service.execute(input)) // Act
+    .isInstanceOf(SomeException.class) // Assert
+    .hasMessage("Some message");
+}
+```
+
+**[⬆ back to top](#table-of-contents)**
+
+### Assert
+
+Sezione in cui si effettuano le assert. Limitare al minimo il numero di asserzioni: un test che ha troppi assert è uno smell per un test che testa troppe cose.
+
+**Eccezione**: i test sui _mapper_, testando la mappatura di `N` campi è naturale che possa esserci un test che abbia ben più di un assert.
+
+**[⬆ back to top](#table-of-contents)**
+
+
+
 ### Test unitari
-
-Per scrivere un test unitario chiaro, vanno rispettate alcune regole:
-
-Le sezioni _Arrange_, _Act_ e _Assert_ devono essere separate da una riga vuota
-- **Arrange**: Sezione in cui si inizializzano gli input dei test ed eventuali mock. Input e mock vanno separati da una riga bianca
-- **Act**: Sezione in cui viene chiamato il metodo che si sta testando
-- **Assert**: sezione in cui si effettuano le assert
 
 ```java
 @Test
