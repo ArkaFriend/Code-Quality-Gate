@@ -43,6 +43,7 @@ Si differenzia dal paragrafo [Code Quality Guidelines](#code-quality-guidelines)
 | [Cyclomatic Complexity](#cyclomatic-complexity) | Livelli di indentazione | 1        | |
 | [Method Length](#method-length)                 | Righe                   | 20       | 5 |
 | [Class Length](#class-length)                   | Righe                   | 100      | 50 |
+| [Dependencies Number](#dependencies-number)     | Quantità                | 4      | |
 
 
 
@@ -122,6 +123,52 @@ Refactor possibili per ridurre la lunghezza delle classi:
 - [Extract Interface](https://refactoring.guru/extract-interface) `Refactor manuale`: helps if it's necessary to have a list of the operations and behaviors that the client can use.
 
 > If a large class is responsible for the graphical interface, you may try to move some of its data and behavior to a separate domain object. In doing so, it may be necessary to store copies of some data in two places and keep the data consistent. Duplicate Observed Data offers a way to do this. ([Fonte](https://refactoring.guru/smells/large-class))
+
+**[⬆ back to top](#table-of-contents)**
+
+
+
+### Dependencies Number
+
+Per [SRP](https://en.wikipedia.org/wiki/Single-responsibility_principle), viene fissato un limite sul numero di dipendenze esterne per ogni classe.
+
+Il numero massimo di dipendenze accettate è 4.
+
+```java
+// BAD
+class A {
+  private final B b;
+  private final C c;
+  private final D d;
+  private final E e;
+  private final F f;
+  private final G g;
+
+  // constructor, getters, etc...
+}
+
+// GOOD
+class A {
+  private final B b;
+  private final C c;
+  private final D d;
+  private final E e;
+
+  // constructor, getters, etc...
+}
+
+class E e {
+  private final F f;
+  private final G g;
+
+  // constructor, getters, etc...
+}
+```
+
+#### Trattamento
+
+Dei refactor possibili per ridurre la complessità ciclomatica potrebbero essere:
+- [Extract Class](https://refactoring.guru/extract-class) `Refactor manuale`: Delegare ad altre classi logiche ove possibile.
 
 **[⬆ back to top](#table-of-contents)**
 
